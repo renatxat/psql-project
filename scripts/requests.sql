@@ -56,12 +56,14 @@ ORDER BY count DESC
 LIMIT 1) max_tariff ON t.tariff_id = max_tariff.tariff_id;
 
 
---Найдём количество топиков в каждом курсе.
-SELECT course_id, COUNT(DISTINCT topic_id)
-FROM courses_topics
-GROUP BY course_id
-ORDER BY course_id;
-    
+--Найдём количество топиков в каждом курсе. Добавим rank.
+SELECT course_id, title, count_topics, RANK() OVER (ORDER BY count_topics DESC) AS rank
+FROM(SELECT c.course_id, c.title, COUNT(DISTINCT ct.topic_id) AS count_topics
+        FROM Courses c JOIN Courses_Topics ct ON c.course_id = ct.course_id
+        GROUP BY c.course_id, c.title
+) AS Crutch
+ORDER BY count_topics DESC;
+
 
 --Найдём количество топиков в каждом тарифе и отсортируем по убыванию.
 WITH number_of_topics_in_courses AS (
