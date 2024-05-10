@@ -22,7 +22,7 @@
 ![Logical diagram](diagrams/ER-logical.png "Logical diagram")
 Можно посмотреть в более хорошем качестве по адресу: ./diagrams/ER-logical.png
 <!---
-Надо фото исправить на Webinars и consuming. Ещё убрал NOT NULL в комментах, поменял пункты с датами в tarrifs_courses. Убрать (min). Поменял тип у продолжительности вебинара. Добавил столбец ответов в таски.
+Надо лайфхак запомнить. drawio по умолчанию png без фона генерирует. Надо просто через paint октрыть и сохранить разок, тогда фон белым становится.
 
 В psql primary key подразумевает not null по дефолту.
 Вообще вся бд странная, потому что айдишники можно было через AUTOINCREMENT или SERIAL сделать.
@@ -159,7 +159,7 @@
 | `task_id`    | Идентификатор | INTEGER | PRIMARY KEY |
 | `title`    | Название | VARCHAR(100) | NOT NULL |
 | `wording`    | Условие | TEXT | NOT NULL |
-| `answer`    | Ответ | VARCHAR(20) | |
+| `answer`    | Ответ | VARCHAR(150) | |
 | `solution`    | Решение | TEXT | |
 | `source`    | Источник | TEXT | |
 | `time_consuming` | Предположительная времязатратность в минутах |SMALLINT| NOT NULL|
