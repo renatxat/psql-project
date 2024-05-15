@@ -7,14 +7,20 @@ SELECT user_id, tariff_id
 FROM project.users_tariffs
 WHERE date_start <= CURRENT_TIMESTAMP AND date_expiration > CURRENT_TIMESTAMP;
 ```
-2) Представление того, в каких тарифах содержится курс  для отображения на сайте.
+2) Представление того, в каких тарифах содержится определённый курс, для отображения на сайте.
 ```sql
-CREATE OR REPLACE VIEW project.tariffs_courses_details AS
+CREATE OR REPLACE VIEW project.courses_details AS
 SELECT tc.tariff_id, tc.course_id, c.title, c.description
 FROM project.tariffs_courses tc
 JOIN project.courses c ON tc.course_id = c.course_id;
 ```
-
+3) Представление того, какие курсы содержит определённый тариф, для отображения на сайте.
+```sql
+CREATE OR REPLACE VIEW project.tariffs_details AS
+SELECT tc.tariff_id, tc.course_id, t.title, t.description, t.cost, t.duration
+FROM project.tariffs_courses tc
+JOIN project.tariffs t ON tc.tariff_id = t.tariff_id;
+```
 ## 9. Индексы
 Cоздадим индексы для ускорения выполнения запросов:
 1) Для быстрого поиска юзеров по фамилии и имени.
@@ -31,7 +37,7 @@ Cоздадим индексы для ускорения выполнения з
     CREATE INDEX courses_title_idx ON project.courses(title);
     ```
 4) Для быстрого поиска, какие тарифы содержат определённый курс, и наоборот.
-   Помогает во втором представлении.
+   Помогает во втором и третьем представлениях.
    ```sql
    CREATE INDEX tariffs_courses_idx ON project.tariffs_courses(tariff_id, course_id);
    ```
