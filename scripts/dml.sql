@@ -1,7 +1,9 @@
---TRUNCATE TABLE users, tariffs, users_tariffs, courses, tariffs_courses , topics , courses_topics , homeworks, webinars, tasks, homeworks_tasks;
+--TRUNCATE TABLE project.users, project.tariffs, project.users_tariffs, project.courses, project.tariffs_courses, project.topics,
+--project.courses_topics, project.homeworks, project.webinars, project.tasks, project.homeworks_tasks
+--RESTART IDENTITY;
 
 
-INSERT INTO Users (user_id, first_name, last_name, surname, gender_is_male, joindate, grade, vk_account)
+INSERT INTO project.users (user_id, first_name, last_name, surname, gender_is_male, joindate, grade, vk_account)
 VALUES
 (1, 'Renat', 'Khatymov', 'Rustemovich', TRUE, '2019-08-28', 10, 'vk.com/renat_marinad'),
 (2, 'Alina', 'Petrova', 'Ivanovna', FALSE, '2020-05-12', 9, 'vk.com/alina_pet'),
@@ -20,7 +22,7 @@ VALUES
 (15, 'Olivia', 'Miller', NULL, FALSE, '2022-01-05', 8, 'vk.com/olivia_miller');
 
 
-INSERT INTO Tariffs (tariff_id, title, description, cost, duration, comment)
+INSERT INTO project.tariffs (tariff_id, title, description, cost, duration, comment)
 VALUES 
 (1, 'Курс подготовки к ЕГЭ-2024 по математике',
 'Подготовка к ЕГЭ по математике за МЕСЯЦ. Курс «Год за месяц» (ГЗМ) это все вебинары, проверки, домашние задания и пробники с сентября. Обучение под руководством Максима Олеговича. Присоединяйся уже сегодня!',
@@ -50,7 +52,7 @@ VALUES
 
 
 -- Заполним условно один учебный год
-INSERT INTO Users_Tariffs (user_id, tariff_id, date_start, date_expiration, real_cost) 
+INSERT INTO project.users_tariffs (user_id, tariff_id, date_start, date_expiration, real_cost) 
 VALUES 
 (1, 20, '2022-08-15', '2022-08-15', 0),
 (1, 20, '2022-09-30', '2022-09-30', 0),
@@ -131,43 +133,45 @@ VALUES
 (6, 19, '2023-04-12', '2023-04-12', 0);
 
 -- Расставим даты окончания действия тарифы в соотвествии с тарифами.Так же поставим real_cost = cost, хотя могла бы быть и какая-то скидка
-UPDATE Users_Tariffs
+UPDATE project.users_tariffs
 SET date_expiration = date_start + (
     SELECT duration
-    FROM Tariffs
-    WHERE Tariffs.tariff_id = Users_Tariffs.tariff_id
+    FROM project.tariffs
+    WHERE project.tariffs.tariff_id = project.users_tariffs.tariff_id
 ),
 real_cost = (
     SELECT cost
-    FROM Tariffs
-    WHERE Tariffs.tariff_id = Users_Tariffs.tariff_id
+    FROM project.tariffs
+    WHERE project.tariffs.tariff_id = project.users_tariffs.tariff_id
 );
 
  
-INSERT INTO Courses (course_id, title, description, date_start, date_expiration)
+INSERT INTO project.courses (course_id, title, description, date_start, date_expiration)
 VALUES
-(1, 'ЕГЭ Русский', NULL, '2022-09-01', '2023-06-03'),
-(2, 'ЕГЭ математика', NULL, '2022-09-01', '2023-05-28'),
-(3, 'Клингонский', 'Смотрим звёздный путь каждый день', '2022-09-01', '2023-05-31'),
-(4, 'Всош 8-9 хард', 'Курс подготовки ко Всош', '2022-09-01', '2023-06-02'),
-(5, 'ЕГЭ Биология', 'Курс подготовки к ЕГЭ по биологии', '2022-09-01', '2023-05-30'),
-(6, 'ЕГЭ История', 'Курс подготовки к ЕГЭ по истории', '2022-09-01', '2023-05-29'),
-(7, 'ЕГЭ Обществознание', 'Курс подготовки к ЕГЭ по обществознанию', '2022-09-01', '2023-06-02'),
-(8, 'ЕГЭ Литература', 'Курс подготовки к ЕГЭ по литературе', '2022-09-01', '2023-06-04'),
-(9, 'ЕГЭ Английский язык', 'Курс подготовки к ЕГЭ по английскому языку', '2022-09-01', '2023-05-27'),
-(10, 'Всош 10-11 хард', 'Курс подготовки ко Всош', '2022-09-01', '2023-06-02'),
-(11, 'Всош 8-9 норм', 'Курс подготовки ко Всош', '2022-09-01', '2023-06-02'),
-(12, 'Перечень 22/23', 'Курс подготовки к перечневым олимпадам', '2022-09-01', '2023-06-02'),
-(13, 'ОГЭ Русский', 'Курс подготовки к ОГЭ по русскому языку', '2022-09-01', '2023-05-28'),
-(14, 'ОГЭ Математика', 'Курс подготовки к ОГЭ по математике', '2022-09-01', '2023-05-27'),
-(15, 'ОГЭ Биология', 'Курс подготовки к ОГЭ по биологии', '2022-09-01', '2023-05-31'),
-(16, 'ОГЭ Обществознание', 'Курс подготовки к ОГЭ по истории', '2022-09-01', '2023-06-01'),
-(19, 'Всош 10-11 норм', 'Курс подготовки ко Всош', '2022-09-01', '2023-06-02'),
-(20, 'Щелчок по математике', 'Курс подготовки к ЕГЭ по математике за 3 недели', '2022-05-17', '2023-06-10'),
-(21, 'ЕГЭ Информатика', 'Курс подготовки к ЕГЭ по информатике', '2022-09-01', '2023-05-31');
+(DEFAULT, 'ЕГЭ Русский', NULL, '2022-09-01', '2023-06-03'),
+(DEFAULT, 'ЕГЭ математика', NULL, '2022-09-01', '2023-05-28'),
+(DEFAULT, 'Клингонский', 'Смотрим звёздный путь каждый день', '2022-09-01', '2023-05-31'),
+(DEFAULT, 'Всош 8-9 хард', 'Курс подготовки ко Всош', '2022-09-01', '2023-06-02'),
+(DEFAULT, 'ЕГЭ Биология', 'Курс подготовки к ЕГЭ по биологии', '2022-09-01', '2023-05-30'),
+(DEFAULT, 'ЕГЭ История', 'Курс подготовки к ЕГЭ по истории', '2022-09-01', '2023-05-29'),
+(DEFAULT, 'ЕГЭ Обществознание', 'Курс подготовки к ЕГЭ по обществознанию', '2022-09-01', '2023-06-02'),
+(DEFAULT, 'ЕГЭ Литература', 'Курс подготовки к ЕГЭ по литературе', '2022-09-01', '2023-06-04'),
+(DEFAULT, 'ЕГЭ Английский язык', 'Курс подготовки к ЕГЭ по английскому языку', '2022-09-01', '2023-05-27'),
+(DEFAULT, 'Всош 10-11 хард', 'Курс подготовки ко Всош', '2022-09-01', '2023-06-02'),
+(DEFAULT, 'Всош 8-9 норм', 'Курс подготовки ко Всош', '2022-09-01', '2023-06-02'),
+(DEFAULT, 'Перечень 22/23', 'Курс подготовки к перечневым олимпадам', '2022-09-01', '2023-06-02'),
+(DEFAULT, 'ОГЭ Русский', 'Курс подготовки к ОГЭ по русскому языку', '2022-09-01', '2023-05-28'),
+(DEFAULT, 'ОГЭ Математика', 'Курс подготовки к ОГЭ по математике', '2022-09-01', '2023-05-27'),
+(DEFAULT, 'ОГЭ Биология', 'Курс подготовки к ОГЭ по биологии', '2022-09-01', '2023-05-31'),
+(DEFAULT, 'ОГЭ Обществознание', 'Курс подготовки к ОГЭ по истории', '2022-09-01', '2023-06-01'),
+(DEFAULT, 'ОГЭ', 'Курс подготовки к ОГЭ по истории', '2022-09-01', '2023-06-01'),
+(DEFAULT, 'ОГЭ по Доте', 'Курс физической подготовки', '2022-09-01', '2023-06-01'),
+(DEFAULT, 'Всош 10-11 норм', 'Курс подготовки ко Всош', '2022-09-01', '2023-06-02'),
+(DEFAULT, 'Щелчок по математике', 'Курс подготовки к ЕГЭ по математике за 3 недели', '2022-05-17', '2023-06-10'),
+(DEFAULT, 'ЕГЭ Информатика', 'Курс подготовки к ЕГЭ по информатике', '2022-09-01', '2023-05-31');
 
 
-INSERT INTO Tariffs_Courses (tariff_id, course_id, duration_of_access, comment) 
+INSERT INTO project.tariffs_courses (tariff_id, course_id, duration_of_access, comment) 
 VALUES 
 (1, 2, '1DAY', NULL),
 (2, 2, '1DAY', NULL),
@@ -220,22 +224,24 @@ VALUES
 (23,14, '1DAY', NULL),
 (23,15, '1DAY', NULL),
 (23,16, '1DAY', NULL),
+(23,17, '1DAY', NULL),
+(23,18, '1DAY', NULL),
 (23,19, '1DAY', NULL),
 (23,20, '1DAY', NULL),
 (23,21, '1DAY', NULL);
 
 -- проставил всем бонусным курса длительность в один месяц, а обычном, как в тарифе
-UPDATE Tariffs_Courses
+UPDATE project.tariffs_courses
 SET duration_of_access = (
     CASE WHEN comment LIKE '%бонус%' THEN '1MONTH'
         ELSE (
         SELECT duration
-        FROM Tariffs
-        WHERE Tariffs.tariff_id = Tariffs_Courses.tariff_id)
+        FROM project.tariffs
+        WHERE project.tariffs.tariff_id = project.tariffs_courses.tariff_id)
     END);
 
 
-INSERT INTO Topics (topic_id, title) 
+INSERT INTO project.topics (topic_id, title) 
 VALUES
 (1, 'Уравнения в целых числах'),
 (2, 'Степень точки и радикальные оси'),
@@ -259,7 +265,7 @@ VALUES
 (20, 'Английский язык: грамматика B1');
 
 
-INSERT INTO Courses_Topics (course_id, topic_id, order_number) 
+INSERT INTO project.courses_topics (course_id, topic_id, order_number) 
 VALUES
 (1, 19, 1),
 (1, 2, 2),
@@ -309,9 +315,10 @@ VALUES
 (16, 12, 1),
 (16, 20, 2),
 (16, 20, 3),
-(19, 12, 1),
-(19, 13, 2),
-(19, 17, 3),
+(17, 3, 1),
+(17, 4, 2),
+(18, 18, 1),
+(18, 15, 2),
 (20, 16, 1),
 (20, 12, 2),
 (20, 18, 3),
@@ -320,7 +327,7 @@ VALUES
 (21, 9, 3);
 
 
-INSERT INTO Homeworks (homework_id, title, date_start, date_expiration, time_consuming, topic_id)
+INSERT INTO project.homeworks (homework_id, title, date_start, date_expiration, time_consuming, topic_id)
 VALUES
 (1, '13-й номер ЕГЭ по математике', '2022-09-23 00:00:00', '2022-09-30 23:59:00', 90, 1),
 (2, '1-5 номера ОГЭ по истории', '2022-09-23 00:00:00', '2022-09-30 23:59:00', 30, 5),
@@ -344,7 +351,7 @@ VALUES
 (20, '16-й номер ЕГЭ по математике для тренировки', '2022-10-11 00:00:00', '2022-10-17 23:59:00', 80, 4);
 
 
-INSERT INTO Webinars (webinar_id, title, path_file, date_start, duration, topic_id)
+INSERT INTO project.webinars (webinar_id, title, path_file, date_start, duration, topic_id)
 VALUES
 (1, 'Уравнения в целых числах-1', 'files/videos/math/ege2024/web1.mp4', '2022-09-23 18:00:00', '2HOURS', 1),
 (2, 'Геометрия: основные понятия и задачи', 'files/videos/math/ege2024/web2.mp4', '2022-09-24 17:30:00', '1.5HOURS', 1),
@@ -368,7 +375,7 @@ VALUES
 (20, 'Информационные технологии в школьной программе и на экзамене ОГЭ и ЕГЭ', 'files/videos/information_technology/oge_ege/web20.mp4', '2022-10-12 22:30:00', '1.5HOURS', 2);
 
 
-INSERT INTO Tasks (task_id, title, wording, answer, solution, source, time_consuming)
+INSERT INTO project.tasks (task_id, title, wording, answer, solution, source, time_consuming)
 VALUES
 (1, 'задача 1', 'Две стороны и высота, проведённая к третьей стороне, одного треугольника, равны двум сторонам и высоте, проведённой к третьей стороне, другого треугольника. Верно ли, что треугольники равны?', 'Нет', NULL, 'ОГЭ-2013', 1),
 (2, 'задача 2', 'Найдите площадь треугольника со сторонами 5, 12 и 13.', '30', 'Площадь треугольника можно найти по формуле Герона: S = sqrt(p * (p - a) * (p - b) * (p - c)), где p - полупериметр треугольника, a, b, c - длины сторон.', 'ЕГЭ-2015', 2),
@@ -452,7 +459,7 @@ VALUES
 (80, 'Задача 20', 'Что такое магнитное поле?', 'Область пространства, в которой проявляются магнитные свойства материалов или токоведущих проводников', NULL, 'ЕГЭ-Физика-2041', 1);
 
 
-INSERT INTO Homeworks_Tasks (homework_id, task_id, index_number)
+INSERT INTO project.homeworks_tasks (homework_id, task_id, index_number)
 VALUES
 (1, 64, 1),
 (1, 35, 2),
@@ -594,3 +601,4 @@ VALUES
 (20, 26, 7),
 (20, 59, 8);
 
+ 
