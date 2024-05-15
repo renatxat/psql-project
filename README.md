@@ -20,7 +20,15 @@
 
 ### 3. Логическая модель
 ![Logical diagram](diagrams/ER-logical.png "Logical diagram")
-Можно посмотреть в более хорошем качестве по адресу: diagrams/ER-logical.png
+Можно посмотреть в более хорошем качестве по адресу: ./diagrams/ER-logical.png
+<!---
+Надо лайфхак запомнить. drawio по умолчанию png без фона генерирует. Надо просто через paint октрыть и сохранить разок, тогда фон белым становится.
+
+В psql primary key подразумевает not null по дефолту.
+Вообще вся бд странная, потому что айдишники можно было через AUTOINCREMENT или SERIAL сделать.
+-->
+
+
 
 Данные отношения находятся в *1НФ*, так как их атрибуты атомарны, а строки различны внутри каждой из них.
 Они находятся в *2НФ*, так как находятся в *1НФ* и каждый не ключевой атрибут неприводимо зависит от любого потенциального ключа.
@@ -34,7 +42,7 @@
 7. `Tasks` - `task_id`, `wording`.
 8. Любые их произведения для связи отношения многие ко многим, очевидно, тоже обладают *2НФ*.
 
-Так же для таблицы Users × Tariffs достпуна **версионность** в формате, учится ли данный пользователь в данный момент по данному тарифу.
+Таблица `Users × Tariffs` будет версионной, ведь пользователи периодически оплачивают новые тарифы. `SCD` (*Slowly changing dimensions*) будет типа $2$, то есть мы будем добавлять новые оплаты в нашу таблицу, не изменяя при этом старые записи.
 
 
 ### 4. Физическая модель
@@ -50,7 +58,7 @@
 | `grade` | Класс обучения | SMALLINT | NOT NULL |
 | `vk_account`  | Аккаунт вк, с которого произошла регистрация | VARCHAR(50) | NOT NULL |
 
-
+Вероятно класс нужно увеличивать на единицу каждое лето, а уже окончивших школу переносить в какую-то другую базу данных.
 
 
 
@@ -65,7 +73,7 @@
 | `description` | Описание | TEXT | |
 | `cost`    | Стоимость в рублях | INTEGER | NOT NULL |
 | `duration` | Продолжительность действия | INTERVAL | NOT NULL|
-| `comment` | TEXT | NOT NULL |
+| `comment` | Комментарий | TEXT | |
 
 
 
@@ -73,13 +81,13 @@
 **Users × Tariffs:**
 | Название | Описание | Тип данных | Ограничение |
 | --------------- | --------------- | --------------- | --------------- |
-| `user_id`    | Пользователь | INTEGER | FOREIGN KEY REFERENCES Users(user_id)|
-| `tariff_id`    | Тариф | INTEGER | FOREIGN KEY REFERENCES Tariff(tariff_id)|
+| `user_id`    | Пользователь | INTEGER |NOT NULL, FOREIGN KEY REFERENCES Users(user_id)|
+| `tariff_id`    | Тариф | INTEGER |NOT NULL, FOREIGN KEY REFERENCES Tariff(tariff_id)|
 | `date_start` | Дата начала действия тарифа | TIMESTAMP | NOT NULL |
 | `date_expiration` | Дата конца действия тарифа | TIMESTAMP | NOT NULL |
 | `real_cost`  | Сколько на самом деле заплатил юзер | INTEGER | NOT NULL 
 
-В случае новой оплаты того же тарифа, например при ежемесячном платеже, мы должны учесть как старые, так и новые даты действия тарифа.
+В случае новой оплаты того же тарифа просто добавляем новую строчку с другими датами, но теми же `tariff_id` и `user_id`.
 
 **Courses:**
 | Название | Описание | Тип данных | Ограничение |
@@ -95,11 +103,12 @@
 **Tariffs × Courses:**
 | Название | Описание | Тип данных | Ограничение |
 | --------------- | --------------- | --------------- | --------------- |
-| `tariff_id`    | Тариф | INTEGER | FOREIGN KEY REFERENCES Tariff(tariff_id)|
-| `course_id`    | Курс | INTEGER | FOREIGN KEY REFERENCES Courses(course_id)|
-| `date_start_of_access` | Дата выдачи досутпа | TIMESTAMP | NOT NULL |
-| `date_expiration_of_access` | Дата конца доступа | TIMESTAMP | NOT NULL |
+| `tariff_id`    | Тариф | INTEGER |NOT NULL, FOREIGN KEY REFERENCES Tariff(tariff_id)|
+| `course_id`    | Курс | INTEGER |NOT NULL, FOREIGN KEY REFERENCES Courses(course_id)|
+| `duration_of_access` | Длительность доступа | INTERVAL | NOT NULL |
+| `comment` | Комментарий | TEXT | |
 
+Общий смысл таблицы в возможности давать курсы по разным предметам для одного тарифа. Смысл длительности доступа в том, что мы хотим бесплатно давать доступ к другим курсам на некоторое время при покупке дорогих тарифов. Типа подарок.
 
 
 **Topics:**
@@ -110,13 +119,13 @@
 | `description` | Описание | TEXT | |
 
 
-Смысл в том, что мы хотим давать людям с разных курсов доступ к какой-то группе вебинаров и дз (topic), посвященные определённой теме.
+Смысл в том, что мы хотим давать людям с разных курсов доступ к какой-то группе вебинаров и дз (topic), посвященных определённому блоку тем, чтобы экономить время преподавателей.
 
 **Courses × Topics:**
 | Название | Описание | Тип данных | Ограничение |
 | --------------- | --------------- | --------------- | --------------- |
-| `course_id`    | Курс | INTEGER | FOREIGN KEY REFERENCES Courses(course_id)|
-| `topic_id`    | Тема | INTEGER | FOREIGN KEY REFERENCES Topics(topic_id)|
+| `course_id`    | Курс | INTEGER | NOT NULL, FOREIGN KEY REFERENCES Courses(course_id)|
+| `topic_id`    | Тема | INTEGER | NOT NULL, FOREIGN KEY REFERENCES Topics(topic_id)|
 | `order_number` | Порядковый номер для правильного отображения | SMALLINT | NOT NULL |
 
 
@@ -128,20 +137,21 @@
 | `description` | Описание | TEXT | |
 | `date_start` | Дата начала сдачи дз | TIMESTAMP | NOT NULL |
 | `date_expiration` | Дедлайн | TIMESTAMP | NOT NULL |
-| `time-consumping(min)` | предположительная времязатратность |SMALLINT| NOT NULL|
-| `topic_id` | Тема | INTEGER | FOREIGN KEY REFERENCES Topics(topic_id)|
+| `time_consuming` | Предположительная времязатратность в минутах|SMALLINT| NOT NULL|
+| `topic_id` | Тема | INTEGER | NOT NULL, FOREIGN KEY REFERENCES Topics(topic_id)|
 
 
-**Vebinars:**
+**Webinars:**
 | Название | Описание | Тип данных | Ограничение |
 | --------------- | --------------- | --------------- | --------------- |
-| `vebinar_id`    | Идентификатор | INTEGER | PRIMARY KEY |
+| `webinar_id`    | Идентификатор | INTEGER | PRIMARY KEY |
 | `title`    | Название | VARCHAR(100) | NOT NULL |
 |`path_file`| Путь к файлу для записи|TEXT | NOT NULL|
-| `date_start` | Дата начала | TIMESTAMP | NOT NULL |
-| `duration` | Продолжительность вебинара| INTERVAL | NOT NULL |
-| `topic_id` | Тема | INTEGER | FOREIGN KEY REFERENCES Topics(topic_id)|
+| `date_start` | Дата начала | TIMESTAMP |
+| `duration` | Предполагаемая продолжительность вебинара| INTERVAL | NOT NULL |
+| `topic_id` | Тема | INTEGER |NOT NULL, FOREIGN KEY REFERENCES Topics(topic_id)|
 
+Это могут быть как заранее записанные видео, так и онлайн-занятия в прямом эфире.
 
 **Tasks:**
 | Название | Описание | Тип данных | Ограничение |
@@ -149,17 +159,18 @@
 | `task_id`    | Идентификатор | INTEGER | PRIMARY KEY |
 | `title`    | Название | VARCHAR(100) | NOT NULL |
 | `wording`    | Условие | TEXT | NOT NULL |
+| `answer`    | Ответ | VARCHAR(150) | |
 | `solution`    | Решение | TEXT | |
 | `source`    | Источник | TEXT | |
-| `time-consumping(min)` | предположительная времязатратность |SMALLINT| NOT NULL|
+| `time_consuming` | Предположительная времязатратность в минутах |SMALLINT| NOT NULL|
 
 
 
 **Homeworks × Tasks:**
 | Название | Описание | Тип данных | Ограничение |
 | --------------- | --------------- | --------------- | --------------- |
-| `homework_id`    | Курс | INTEGER | FOREIGN KEY REFERENCES Homework(homework_id)|
-| `task_id`    | Тема | INTEGER | FOREIGN KEY REFERENCES Tasks(task_id)|
+| `homework_id`    | Задание (домашнее) | INTEGER |NOT NULL, FOREIGN KEY REFERENCES Homework(homework_id)|
+| `task_id`    | Задача (таска)| INTEGER |NOT NULL, FOREIGN KEY REFERENCES Tasks(task_id)|
 | `index_number` | Порядковый номер для правильного отображения | SMALLINT | NOT NULL |
 
 
