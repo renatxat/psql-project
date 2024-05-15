@@ -49,7 +49,7 @@
 **Users:**
 | Название | Описание | Тип данных | Ограничение |
 | --------------- | --------------- | --------------- | --------------- |
-| `user_id`    | Идентификатор | INTEGER | PRIMARY KEY |
+| `user_id`    | Идентификатор | SERIAL | PRIMARY KEY |
 | `first_name`    | Имя | VARCHAR(20) | NOT NULL |
 | `last_name`    | Фамилия | VARCHAR(20) | NOT NULL |
 | `surname` | Отчество | VARCHAR(30) ||
@@ -68,7 +68,7 @@
 **Tariffs:**
 | Название | Описание | Тип данных | Ограничение |
 | --------------- | --------------- | --------------- | --------------- |
-| `tariff_id`    | Идентификатор | INTEGER | PRIMARY KEY |
+| `tariff_id`    | Идентификатор | SERIAL | PRIMARY KEY |
 | `title`    | Название | TEXT | NOT NULL |
 | `description` | Описание | TEXT | |
 | `cost`    | Стоимость в рублях | INTEGER | NOT NULL |
@@ -92,7 +92,7 @@
 **Courses:**
 | Название | Описание | Тип данных | Ограничение |
 | --------------- | --------------- | --------------- | --------------- |
-| `course_id`    | Идентификатор | INTEGER | PRIMARY KEY |
+| `course_id`    | Идентификатор | SERIAL | PRIMARY KEY |
 | `title`    | Название | VARCHAR(100) | NOT NULL |
 | `description` | Описание | TEXT | |
 | `date_start` | Дата начала курса | TIMESTAMP | NOT NULL |
@@ -114,7 +114,7 @@
 **Topics:**
 | Название | Описание | Тип данных | Ограничение |
 | --------------- | --------------- | --------------- | --------------- |
-| `topic_id`    | Идентификатор | INTEGER | PRIMARY KEY |
+| `topic_id`    | Идентификатор | SERIAL | PRIMARY KEY |
 | `title`    | Название | VARCHAR(100) | NOT NULL |
 | `description` | Описание | TEXT | |
 
@@ -132,7 +132,7 @@
 **Homeworks:**
 | Название | Описание | Тип данных | Ограничение |
 | --------------- | --------------- | --------------- | --------------- |
-| `homework_id`    | Идентификатор | INTEGER | PRIMARY KEY |
+| `homework_id`    | Идентификатор | SERIAL | PRIMARY KEY |
 | `title`    | Название | VARCHAR(100) | NOT NULL |
 | `description` | Описание | TEXT | |
 | `date_start` | Дата начала сдачи дз | TIMESTAMP | NOT NULL |
@@ -144,7 +144,7 @@
 **Webinars:**
 | Название | Описание | Тип данных | Ограничение |
 | --------------- | --------------- | --------------- | --------------- |
-| `webinar_id`    | Идентификатор | INTEGER | PRIMARY KEY |
+| `webinar_id`    | Идентификатор | SERIAL | PRIMARY KEY |
 | `title`    | Название | VARCHAR(100) | NOT NULL |
 |`path_file`| Путь к файлу для записи |TEXT | NOT NULL|
 | `date_start` | Дата начала | TIMESTAMP |
@@ -156,7 +156,7 @@
 **Tasks:**
 | Название | Описание | Тип данных | Ограничение |
 | --------------- | --------------- | --------------- | --------------- |
-| `task_id`    | Идентификатор | INTEGER | PRIMARY KEY |
+| `task_id`    | Идентификатор | SERIAL | PRIMARY KEY |
 | `title`    | Название | VARCHAR(100) | NOT NULL |
 | `wording`    | Условие | TEXT | NOT NULL |
 | `answer`    | Ответ | VARCHAR(150) | |
