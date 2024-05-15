@@ -146,7 +146,7 @@
 | --------------- | --------------- | --------------- | --------------- |
 | `webinar_id`    | Идентификатор | INTEGER | PRIMARY KEY |
 | `title`    | Название | VARCHAR(100) | NOT NULL |
-|`path_file`| Путь к файлу для записи|TEXT | NOT NULL|
+|`path_file`| Путь к файлу для записи |TEXT | NOT NULL|
 | `date_start` | Дата начала | TIMESTAMP |
 | `duration` | Предполагаемая продолжительность вебинара| INTERVAL | NOT NULL |
 | `topic_id` | Тема | INTEGER |NOT NULL, FOREIGN KEY REFERENCES Topics(topic_id)|
